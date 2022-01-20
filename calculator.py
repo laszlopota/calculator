@@ -264,8 +264,10 @@ def equals():
     check_zero_division()
     expression = round_result(expression)
     expressionPart = ''
+    clearButton['text'] = 'AC'
     gotResult = True
     print(expression)
+
 
 # Colors for the GUI
 black = '#000000'
@@ -290,7 +292,6 @@ window.resizable(0, 0)
 borderHeight = 30
 
 border = Canvas(window, highlightthickness=0)
-# border.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
 border.create_rectangle(0, 0, windowWidth - 2, borderHeight, fill=borderColor)
 
 buttonBorder = 4
@@ -305,17 +306,17 @@ hiddenBorder = Canvas(window, highlightthickness=0)
 hiddenBorder.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
 hiddenBorder.create_rectangle(0, 0, windowWidth - 2, borderHeight, fill=black)
 
-def hide_border(event):
+def hide_border():
     border.place(x=0, y=0, width=0, height=0)
     hiddenBorder.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
 
-def reveal_border(event):
+def reveal_border():
     border.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
     hiddenBorder.place(x=0, y=0, width=0, height=0)
 
 
-hiddenBorder.bind('<Enter>', reveal_border)
-border.bind('<Leave>', hide_border)
+hiddenBorder.bind('<Enter>', lambda event: reveal_border())
+border.bind('<Leave>', lambda event: hide_border())
 
 # Moving the window
 mouseX = None
@@ -335,14 +336,14 @@ def on_press(event):
     mouseX = event.x
     mouseY = event.y
 
-def on_release(event):
+def on_release():
     global mouseX, mouseY
     mouseX = None
     mouseY = None
 
 
 border.bind('<ButtonPress-1>', on_press)
-border.bind('<ButtonRelease-1>', on_release)
+border.bind('<ButtonRelease-1>', lambda event: on_release())
 border.bind('<B1-Motion>', move_window)
 
 # Creating the buttons
