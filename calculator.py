@@ -9,12 +9,13 @@ gotResult = False
 
 # Helper functions
 def check_error():
-    global expression, expressionPart
+    global expression, expressionPart, gotResult
 
     if label['text'] == 'Error':
         expression = ''
         expressionPart = ''
         label['text'] = '0'
+    gotResult = False
 
 def check_zero_division():
     global expression, expressionPart
@@ -191,6 +192,8 @@ def division():
 
 def plus_minus():
     global expression, operationPressed, expressionPart
+
+    check_error()
 
     if operationPressed:
         label['text'] = '0'
