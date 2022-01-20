@@ -15,7 +15,7 @@ def check_error():
         expression = ''
         expressionPart = ''
         label['text'] = '0'
-    gotResult = False
+        gotResult = False
 
 def check_zero_division():
     global expression, expressionPart
@@ -46,7 +46,7 @@ def round_result(someExpression):
             if len(str(eval(someExpression))) < 10 and 'e' not in str(eval(someExpression)):
                 someExpression = str((eval(someExpression)))
                 label['text'] = someExpression.replace('.', ',')
-            elif len(str(eval(someExpression))) >= 10:
+            elif len(str(int(eval(someExpression)))) >= 10 or 'e' in str(eval(someExpression)):
                 someExpression = "%10.3e" % (eval(someExpression))
                 label['text'] = someExpression.replace('.', ',')
             else:
@@ -54,6 +54,17 @@ def round_result(someExpression):
                 label['text'] = someExpression.replace('.', ',')
             someExpression = label['text'].replace(',', '.')
     return someExpression
+
+def set_default_button_colors():
+    additionButton['background'] = orange
+    subtractionButton['background'] = orange
+    multiplicationButton['background'] = orange
+    divisionButton['background'] = orange
+
+    additionButton['foreground'] = white
+    subtractionButton['foreground'] = white
+    multiplicationButton['foreground'] = white
+    divisionButton['foreground'] = white
 
 # Functions for the calculations
 def add_number_to_expression(someExpression):
@@ -63,11 +74,18 @@ def add_number_to_expression(someExpression):
     return someExpression
 
 def add_number_to_label(number):
-    global expression, operationPressed
+    global expression, operationPressed, gotResult
 
     if operationPressed:
         label['text'] = ''
+        set_default_button_colors()
         operationPressed = False
+
+    if gotResult:
+        label['text'] = ''
+        set_default_button_colors()
+        expression = ''
+        gotResult = False
 
     check_error()
     if label['text'] == '0':
@@ -80,11 +98,18 @@ def add_number_to_label(number):
     clearButton['text'] = 'C'
 
 def add_comma():
-    global expression, operationPressed
+    global expression, operationPressed, gotResult
 
     if operationPressed:
         label['text'] = '0'
+        set_default_button_colors()
         operationPressed = False
+
+    if gotResult:
+        label['text'] = ''
+        set_default_button_colors()
+        expression = ''
+        gotResult = False
 
     check_error()
     if ',' not in label['text']:
@@ -102,6 +127,7 @@ def clear():
         clearButton['text'] = 'AC'
     label['text'] = '0'
 
+    set_default_button_colors()
     operationPressed = False
     gotResult = False
     print(expression)
@@ -110,6 +136,7 @@ def addition():
     global expression, operationPressed, expressionPart, gotResult
 
     check_error()
+    set_default_button_colors()
 
     if not gotResult and not operationPressed:
         expression = add_number_to_expression(expression)
@@ -126,12 +153,15 @@ def addition():
     expression += '+'
     gotResult = False
     operationPressed = True
+
+    additionButton['background'], additionButton['foreground'] = additionButton['foreground'], additionButton['background']
     print(expression)
 
 def subtraction():
     global expression, operationPressed, expressionPart, gotResult
 
     check_error()
+    set_default_button_colors()
 
     if not gotResult and not operationPressed:
         expression = add_number_to_expression(expression)
@@ -148,12 +178,15 @@ def subtraction():
     expression += '-'
     gotResult = False
     operationPressed = True
+
+    subtractionButton['background'], subtractionButton['foreground'] = subtractionButton['foreground'], subtractionButton['background']
     print(expression)
 
 def multiplication():
     global expression, operationPressed, expressionPart, gotResult
 
     check_error()
+    set_default_button_colors()
 
     if not gotResult and not operationPressed:
         expressionPart = add_number_to_expression(expressionPart)
@@ -167,6 +200,8 @@ def multiplication():
     expressionPart += '*'
     gotResult = False
     operationPressed = True
+
+    multiplicationButton['background'], multiplicationButton['foreground'] = multiplicationButton['foreground'], multiplicationButton['background']
     print(expressionPart)
     print(expression)
 
@@ -174,6 +209,7 @@ def division():
     global expression, operationPressed, expressionPart, gotResult
 
     check_error()
+    set_default_button_colors()
 
     if not gotResult and not operationPressed:
         expressionPart = add_number_to_expression(expressionPart)
@@ -187,6 +223,8 @@ def division():
     expressionPart += '/'
     gotResult = False
     operationPressed = True
+
+    divisionButton['background'], divisionButton['foreground'] = divisionButton['foreground'], divisionButton['background']
     print(expressionPart)
     print(expression)
 
@@ -235,20 +273,81 @@ white = '#ffffff'
 darkgray = '#333333'
 lightgray = '#a5a5a5'
 orange = '#f28b01'
+borderColor = '#2a2a2a'
+red = '#ff0000'
 
 # Setting up the window
 windowWidth = 450
-windowHeight = 600
+windowHeight = 630
 
 window = Tk()
-window.title('Calculator')
+window.overrideredirect(True)
 window.geometry(f'{windowWidth}x{windowHeight}')
 window['background'] = black
 window.resizable(0, 0)
 
+# Creating the border
+borderHeight = 30
+
+border = Canvas(window, highlightthickness=0)
+# border.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
+border.create_rectangle(0, 0, windowWidth - 2, borderHeight, fill=borderColor)
+
+buttonBorder = 4
+exitButton = Button(
+    border, text='x', name='exitButton', background=red, foreground=black, border=0, font=('Helvetica', 10),
+    command=lambda: window.destroy()
+)
+exitButton.place(x=410, y=0 + buttonBorder, width=40 - buttonBorder, height=borderHeight - 2 * buttonBorder)
+
+# Hiding the border
+hiddenBorder = Canvas(window, highlightthickness=0)
+hiddenBorder.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
+hiddenBorder.create_rectangle(0, 0, windowWidth - 2, borderHeight, fill=black)
+
+def hide_border(event):
+    border.place(x=0, y=0, width=0, height=0)
+    hiddenBorder.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
+
+def reveal_border(event):
+    border.place(x=1, y=1, width=windowWidth - 2, height=borderHeight)
+    hiddenBorder.place(x=0, y=0, width=0, height=0)
+
+
+hiddenBorder.bind('<Enter>', reveal_border)
+border.bind('<Leave>', hide_border)
+
+# Moving the window
+mouseX = None
+mouseY = None
+
+def move_window(event):
+    global mouseX, mouseY
+    deltaX = event.x - mouseX
+    deltaY = event.y - mouseY
+    newX = window.winfo_x() + deltaX
+    newY = window.winfo_y() + deltaY
+
+    window.geometry(f'+{newX}+{newY}')
+
+def on_press(event):
+    global mouseX, mouseY
+    mouseX = event.x
+    mouseY = event.y
+
+def on_release(event):
+    global mouseX, mouseY
+    mouseX = None
+    mouseY = None
+
+
+border.bind('<ButtonPress-1>', on_press)
+border.bind('<ButtonRelease-1>', on_release)
+border.bind('<B1-Motion>', move_window)
+
 # Creating the buttons
 buttonWidth = windowWidth / 5
-buttonHeight = windowHeight / 8
+buttonHeight = (windowHeight - borderHeight) / 8
 spaceInBetween = windowWidth / 5 / 5
 
 numberButtons = []
