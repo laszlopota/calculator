@@ -138,17 +138,17 @@ def addition():
     check_error()
     set_default_button_colors()
 
-    if not gotResult and not operationPressed:
+    if not gotResult and not operationPressed and expressionPart == '':
         expression = add_number_to_expression(expression)
-        check_zero_division()
-
-    if expressionPart != '':
+    elif expressionPart != '':
+        expressionPart = add_number_to_expression(expressionPart)
         expression += expressionPart
         expressionPart = ''
 
     if expression != '':
         expression = check_last_character(expression)
 
+    check_zero_division()
     expression = round_result(expression)
     expression += '+'
     gotResult = False
@@ -163,17 +163,17 @@ def subtraction():
     check_error()
     set_default_button_colors()
 
-    if not gotResult and not operationPressed:
+    if not gotResult and not operationPressed and expressionPart == '':
         expression = add_number_to_expression(expression)
-        check_zero_division()
-
-    if expressionPart != '':
+    elif expressionPart != '':
+        expressionPart = add_number_to_expression(expressionPart)
         expression += expressionPart
         expressionPart = ''
 
     if expression != '':
         expression = check_last_character(expression)
 
+    check_zero_division()
     expression = round_result(expression)
     expression += '-'
     gotResult = False
